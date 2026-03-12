@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Election Commission of India — AI Booth Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy:#0B2545;--navy2:#13315C;--navy3:#1A3A6B;
+  --gold:#C8992A;--gold2:#E8B84B;--saffron:#FF8C00;
+  --green:#138808;--green2:#1AAD0E;--white:#F8F6F0;
+  --offwhite:#EEE9DC;--text:#1A1A2E;--muted:#5A6275;
+  --border:#C8B99A;--red:#B22222;--card:#FFFFFF;
+  --bg:#F0EDE4;--stripe:#E8E3D8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'Noto Sans',sans-serif;color:var(--text);min-height:100vh;}
+.gov-band{background:var(--navy);padding:0.35rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+.gov-band-left{display:flex;align-items:center;gap:0.6rem;}
+.gov-band-text{font-family:'Noto Serif',serif;color:var(--gold2);font-size:0.72rem;letter-spacing:0.05em;}
+.gov-band-right{font-size:0.62rem;color:#8899BB;letter-spacing:0.08em;}
+.tricolor{height:4px;background:linear-gradient(to right,var(--saffron) 33.3%,white 33.3% 66.6%,var(--green) 66.6%);}
+.main-header{background:var(--navy2);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;border-bottom:3px solid var(--gold);}
+.header-logo{display:flex;align-items:center;gap:1rem;}
+.logo-emblem{width:56px;height:56px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;border:2px solid var(--gold2);}
+.header-main{font-family:'Noto Serif',serif;font-size:1.05rem;font-weight:700;color:var(--white);letter-spacing:0.03em;}
+.header-sub{font-size:0.65rem;color:var(--gold2);letter-spacing:0.1em;margin-top:0.15rem;}
+.header-sub2{font-size:0.6rem;color:#8899BB;margin-top:0.1rem;}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;}
+.logout-btn{background:transparent;border:1px solid #445577;border-radius:4px;padding:0.3rem 0.8rem;color:#8899BB;font-size:0.62rem;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.logout-btn:hover{border-color:var(--gold);color:var(--gold);}
+.nav-bar{background:var(--navy);border-bottom:2px solid var(--gold);display:flex;overflow-x:auto;}
+.nav-tab{padding:0.7rem 1.3rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:#8899BB;font-family:inherit;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;letter-spacing:0.03em;}
+.nav-tab:hover{color:var(--white);background:#13315C;}
+.nav-tab.active{color:var(--gold2);border-bottom-color:var(--gold);background:#0B2545;}
+.breadcrumb{background:var(--offwhite);border-bottom:1px solid var(--border);padding:0.4rem 1.5rem;font-size:0.62rem;color:var(--muted);}
+.breadcrumb span{color:var(--navy);}
+.page{display:none;padding:1.5rem;}
+.page.active{display:block;}
+.section-title{font-family:'Noto Serif',serif;font-size:0.85rem;font-weight:700;color:var(--navy);border-left:4px solid var(--gold);padding-left:0.6rem;margin-bottom:1rem;letter-spacing:0.02em;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.card-title{font-size:0.65rem;letter-spacing:0.12em;color:var(--muted);margin-bottom:0.8rem;text-transform:uppercase;border-bottom:1px solid var(--stripe);padding-bottom:0.5rem;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.9rem 1rem;border-top:3px solid var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.stat-value{font-family:'Noto Serif',serif;font-size:1.8rem;font-weight:700;color:var(--navy);}
+.stat-label{font-size:0.6rem;color:var(--muted);margin-top:0.2rem;text-transform:uppercase;letter-spacing:0.07em;}
+.stat-card.gold{border-top-color:var(--gold);}
+.stat-card.green{border-top-color:var(--green);}
+.stat-card.saffron{border-top-color:var(--saffron);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;}
+table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+thead{background:var(--navy);}
+th{text-align:left;padding:0.55rem 0.8rem;font-size:0.62rem;color:var(--gold2);letter-spacing:0.08em;font-weight:600;}
+td{padding:0.55rem 0.8rem;border-bottom:1px solid var(--stripe);color:var(--text);}
+tr:hover td{background:var(--offwhite);}
+tr:last-child td{border-bottom:none;}
+.form-group{margin-bottom:0.9rem;}
+.form-label{font-size:0.65rem;color:var(--navy);letter-spacing:0.06em;margin-bottom:0.35rem;display:block;font-weight:600;text-transform:uppercase;}
+.form-input,.form-select{width:100%;background:var(--white);border:1px solid var(--border);border-radius:3px;padding:0.6rem 0.8rem;color:var(--text);font-family:inherit;font-size:0.82rem;outline:none;transition:border-color 0.2s;}
+.form-input:focus,.form-select:focus{border-color:var(--navy);box-shadow:0 0 0 2px rgba(11,37,69,0.1);}
+.form-input::placeholder{color:#AAAAAA;}
+.btn-primary{background:var(--navy);border:none;border-radius:3px;padding:0.6rem 1.4rem;color:var(--white);font-weight:600;font-size:0.78rem;cursor:pointer;font-family:inherit;letter-spacing:0.05em;transition:background 0.2s;}
+.btn-primary:hover{background:var(--navy3);}
+.btn-primary:disabled{background:#8899BB;cursor:not-allowed;}
+.btn-gold{background:var(--gold);border:none;border-radius:3px;padding:0.6rem 1.4rem;color:var(--navy);font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit;transition:background 0.2s;}
+.btn-gold:hover{background:var(--gold2);}
+.btn-outline{background:transparent;border:1px solid var(--border);border-radius:3px;padding:0.55rem 1.1rem;color:var(--muted);font-size:0.75rem;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.btn-outline:hover{border-color:var(--navy);color:var(--navy);}
+.badge{font-size:0.6rem;border-radius:2px;padding:0.15rem 0.55rem;font-weight:600;letter-spacing:0.05em;}
+.badge-green{background:#E8F5E9;color:var(--green);}
+.badge-navy{background:#E8EDF5;color:var(--navy);}
+.badge-gold{background:#FFF8E1;color:#8B6914;}
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.step{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.9rem;transition:all 0.4s;border-top:3px solid var(--border);}
+.step.active{border-top-color:var(--saffron);background:#FFFBF0;box-shadow:0 2px 12px rgba(200,153,42,0.15);}
+.step.done{border-top-color:var(--green);background:#F0FFF0;}
+.step-icon{font-size:1.3rem;margin-bottom:0.3rem;}
+.step-label{font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:0.2rem;}
+.step.active .step-label{color:var(--saffron);}
+.step.done .step-label{color:var(--green);}
+.step-desc{font-size:0.62rem;color:var(--muted);line-height:1.4;}
+.map-area{position:relative;height:210px;background:#E8EDF5;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.map-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.booth-node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:2;text-align:center;}
+.booth-dot{width:42px;height:42px;border-radius:50%;background:var(--navy2);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:var(--gold2);transition:all 0.2s;margin:0 auto;}
+.booth-dot.selected{background:var(--gold);color:var(--navy);border-color:var(--navy);box-shadow:0 0 12px rgba(200,153,42,0.5);}
+.booth-lbl{font-size:0.52rem;color:var(--navy);margin-top:3px;white-space:nowrap;font-weight:600;}
+.voter-row{display:flex;align-items:center;justify-content:space-between;padding:0.45rem 0.7rem;border-radius:3px;margin-bottom:0.3rem;background:var(--offwhite);cursor:pointer;border:1px solid var(--border);transition:all 0.2s;}
+.voter-row:hover{border-color:var(--navy);background:var(--white);}
+.cluster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.cluster-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1rem;border-left:4px solid var(--border);transition:all 0.4s;}
+.cluster-update{margin-top:0.5rem;font-size:0.62rem;line-height:1.4;border-top:1px solid var(--stripe);padding-top:0.4rem;display:none;color:var(--navy);}
+.cluster-card.active .cluster-update{display:block;}
+.ai-panel{background:var(--card);border:1px solid var(--border);border-radius:4px;display:flex;flex-direction:column;height:520px;}
+.ai-header{background:var(--navy);padding:0.75rem 1rem;border-radius:4px 4px 0 0;display:flex;align-items:center;gap:0.6rem;}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green2);box-shadow:0 0 6px var(--green2);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.ai-header-text{font-size:0.75rem;font-weight:700;color:var(--gold2);letter-spacing:0.05em;}
+.ai-header-sub{font-size:0.6rem;color:#8899BB;margin-left:auto;}
+.ai-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;}
+.msg{max-width:85%;padding:0.65rem 0.85rem;border-radius:4px;font-size:0.78rem;line-height:1.6;}
+.msg-user{background:var(--navy);color:var(--white);align-self:flex-end;border-radius:4px 4px 0 4px;}
+.msg-ai{background:var(--offwhite);color:var(--text);align-self:flex-start;border-left:3px solid var(--gold);border-radius:0 4px 4px 4px;}
+.msg-ai-label{font-size:0.58rem;color:var(--gold);font-weight:700;letter-spacing:0.1em;margin-bottom:0.3rem;}
+.msg-thinking{color:var(--muted);font-style:italic;font-size:0.72rem;}
+.ai-input-area{padding:0.75rem;border-top:1px solid var(--border);display:flex;gap:0.5rem;background:var(--offwhite);}
+.ai-input{flex:1;background:var(--white);border:1px solid var(--border);border-radius:3px;padding:0.55rem 0.8rem;font-family:inherit;font-size:0.78rem;color:var(--text);outline:none;}
+.ai-input:focus{border-color:var(--navy);}
+.ai-suggestions{padding:0.5rem 0.75rem 0.75rem;display:flex;flex-wrap:wrap;gap:0.4rem;background:var(--offwhite);border-top:1px solid var(--stripe);}
+.ai-chip{font-size:0.62rem;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:0.2rem 0.65rem;cursor:pointer;color:var(--navy);transition:all 0.2s;}
+.ai-chip:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy);flex-direction:column;}
+.login-flag{display:flex;height:6px;width:240px;border-radius:1px;overflow:hidden;margin-bottom:1.5rem;}
+.login-flag div:nth-child(1){flex:1;background:var(--saffron);}
+.login-flag div:nth-child(2){flex:1;background:white;}
+.login-flag div:nth-child(3){flex:1;background:var(--green);}
+.login-box{background:var(--white);border-radius:4px;padding:2.5rem 2rem;width:100%;max-width:400px;border-top:5px solid var(--gold);}
+.login-emblem{text-align:center;font-size:3rem;margin-bottom:0.5rem;}
+.login-title{text-align:center;font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
+.login-sub{text-align:center;font-size:0.62rem;color:var(--muted);letter-spacing:0.12em;margin-bottom:1.5rem;text-transform:uppercase;}
+.login-divider{height:1px;background:var(--border);margin:1rem 0;}
+.login-btn{width:100%;background:var(--navy);border:none;border-radius:3px;padding:0.75rem;color:var(--white);font-weight:700;font-size:0.85rem;cursor:pointer;font-family:'Noto Serif',serif;letter-spacing:0.05em;margin-top:0.5rem;}
+.login-btn:hover{background:var(--navy3);}
+.login-hint{text-align:center;font-size:0.62rem;color:var(--muted);margin-top:1rem;background:var(--offwhite);padding:0.5rem;border-radius:3px;}
+.notice{background:#FFFBF0;border:1px solid var(--gold);border-left:4px solid var(--gold);border-radius:3px;padding:0.65rem 0.9rem;font-size:0.72rem;color:var(--navy);margin-bottom:1rem;}
+.notice-label{font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.2rem;text-transform:uppercase;}
+.biometric-box{background:var(--offwhite);border:2px dashed var(--border);border-radius:4px;padding:1.2rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.biometric-box:hover{border-color:var(--navy);}
+.biometric-box.verified{border-color:var(--green);background:#F0FFF0;border-style:solid;}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);border:1px solid var(--gold);border-radius:4px;padding:0.9rem 1.2rem;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:9999;display:none;border-left:4px solid var(--gold);}
+#toast.show{display:block;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.gov-footer{background:var(--navy);padding:1rem 1.5rem;margin-top:2rem;border-top:3px solid var(--gold);}
+.gov-footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;}
+.gov-footer-text{font-size:0.62rem;color:#8899BB;letter-spacing:0.06em;}
+.gov-footer-links{display:flex;gap:1.2rem;}
+.gov-footer-links span{font-size:0.62rem;color:var(--gold2);cursor:pointer;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+@media(max-width:768px){.grid4,.grid2,.pipeline,.cluster-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.grid4,.grid2,.pipeline,.cluster-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-flag"><div></div><div></div><div></div></div>
+  <div class="login-box">
+    <div class="login-emblem">🏛️</div>
+    <div class="login-title">Election Commission of India</div>
+    <div class="login-sub">AI Booth Management System</div>
+    <div class="login-divider"></div>
+    <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="loginUser" type="text" placeholder="Enter any username"/></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="loginPass" type="password" placeholder="Enter any password"/></div>
+    <button class="login-btn" onclick="doLogin()">SECURE LOGIN →</button>
+    <div class="login-hint">Enter any username and password to access the portal</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+  <div class="gov-band">
+    <div class="gov-band-left"><span style="font-size:1.4rem">🇮🇳</span><span class="gov-band-text">भारत सरकार — Government of India &nbsp;|&nbsp; Election Commission of India</span></div>
+    <div class="gov-band-right" id="clockDisplay"></div>
+  </div>
+  <div class="tricolor"></div>
+  <div class="main-header">
+    <div class="header-logo">
+      <div class="logo-emblem">⚖️</div>
+      <div>
+        <div class="header-main">AI Booth Management &amp; Knowledge Graph System</div>
+        <div class="header-sub">ELECTION COMMISSION OF INDIA — SECURE ADMIN PORTAL</div>
+        <div class="header-sub2">Constituency: Thiruvananthapuram District, Kerala</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span style="font-size:0.65rem;color:var(--gold2)" id="topUser">👤 ADMIN</span>
+      <button class="logout-btn" onclick="doLogout()">⬡ LOGOUT</button>
+    </div>
+  </div>
+  <div class="nav-bar">
+    <button class="nav-tab active" onclick="showTab('dashboard',this)">🏠 Dashboard</button>
+    <button class="nav-tab" onclick="showTab('registration',this)">📋 Voter Registration</button>
+    <button class="nav-tab" onclick="showTab('candidates',this)">🏅 Candidates</button>
+    <button class="nav-tab" onclick="showTab('analytics',this)">📊 Analytics</button>
+    <button class="nav-tab" onclick="showTab('knowledge',this)">🕸️ Knowledge Graph</button>
+    <button class="nav-tab" onclick="showTab('ai',this)">🤖 AI Assistant</button>
+  </div>
+  <div class="breadcrumb" id="breadcrumb">Home &rsaquo; <span>Dashboard</span></div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="notice"><div class="notice-label">⚠ Official Notice</div>This portal is restricted to authorised Election Commission personnel only. All actions are logged and audited.</div>
+    <div class="grid4">
+      <div class="stat-card"><div class="stat-value" id="statVoters">8</div><div class="stat-label">Registered Voters</div></div>
+      <div class="stat-card gold"><div class="stat-value" id="statCandidates">4</div><div class="stat-label">Candidates</div></div>
+      <div class="stat-card green"><div class="stat-value">4</div><div class="stat-label">Active Booths</div></div>
+      <div class="stat-card saffron"><div class="stat-value">7</div><div class="stat-label">Issue Categories</div></div>
+    </div>
+    <div class="section-title">Data Processing Pipeline</div>
+    <div class="pipeline">
+      <div class="step" id="step1"><div class="step-icon">📥</div><div class="step-label" id="lbl1">Voter Data In</div><div class="step-desc">Raw voter records loaded into central server</div></div>
+      <div class="step" id="step2"><div class="step-icon">🕸️</div><div class="step-label" id="lbl2">Graph Built</div><div class="step-desc">Neo4j connects voters → booths → issues</div></div>
+      <div class="step" id="step3"><div class="step-icon">🧠</div><div class="step-label" id="lbl3">ML Clustering</div><div class="step-desc">Scikit-learn groups voters by shared traits</div></div>
+      <div class="step" id="step4"><div class="step-icon">📡</div><div class="step-label" id="lbl4">Updates Delivered</div><div class="step-desc">Targeted governance updates dispatched</div></div>
+    </div>
+    <div style="margin-bottom:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <button class="btn-primary" id="runBtn" onclick="runFlow()">▶ EXECUTE DATA FLOW</button>
+      <button class="btn-outline" onclick="showTab('ai',document.querySelectorAll('.nav-tab')[5])">🤖 Ask AI Assistant</button>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Booth Map — Thiruvananthapuram District</div>
+        <div class="map-area" id="mapArea">
+          <svg class="map-svg" id="mapSvg"></svg>
+          <div style="position:absolute;left:20%;top:0;bottom:0;border-left:1px solid #C8B99A33"></div>
+          <div style="position:absolute;left:40%;top:0;bottom:0;border-left:1px solid #C8B99A33"></div>
+          <div style="position:absolute;left:60%;top:0;bottom:0;border-left:1px solid #C8B99A33"></div>
+          <div style="position:absolute;left:80%;top:0;bottom:0;border-left:1px solid #C8B99A33"></div>
+          <div style="position:absolute;top:33%;left:0;right:0;border-top:1px solid #C8B99A33"></div>
+          <div style="position:absolute;top:66%;left:0;right:0;border-top:1px solid #C8B99A33"></div>
+          <div class="booth-node" style="left:22%;top:65%" onclick="selectBooth('B-03')"><div class="booth-dot" id="dot-B-03">B-03</div><div class="booth-lbl">Vanchiyoor</div></div>
+          <div class="booth-node" style="left:48%;top:28%" onclick="selectBooth('B-07')"><div class="booth-dot" id="dot-B-07">B-07</div><div class="booth-lbl">Pattom</div></div>
+          <div class="booth-node" style="left:73%;top:55%" onclick="selectBooth('B-12')"><div class="booth-dot" id="dot-B-12">B-12</div><div class="booth-lbl">Kowdiar</div></div>
+          <div class="booth-node" style="left:60%;top:80%" onclick="selectBooth('B-15')"><div class="booth-dot" id="dot-B-15">B-15</div><div class="booth-lbl">Sasthamangalam</div></div>
+        </div>
+        <div id="voterList" style="display:none;margin-top:0.8rem;">
+          <div class="card-title" id="voterListTitle"></div>
+          <div id="voterRows"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Voter Register — Current Session</div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>ID</th><th>Name</th><th>Booth</th><th>Group</th><th>Issue</th></tr></thead><tbody id="voterTableBody"></tbody></table></div>
+      </div>
+    </div>
+    <div class="section-title">ML Voter Clusters</div>
+    <div class="cluster-grid" id="clusterGrid"></div>
+  </div>
+
+  <!-- VOTER REGISTRATION -->
+  <div class="page" id="page-registration">
+    <div style="max-width:750px;margin-top:0.5rem;">
+      <div class="notice"><div class="notice-label">📋 Instructions</div>All fields are mandatory. Biometric verification is required before submission as per Section 23 of the Representation of the People Act.</div>
+      <div id="regSuccess" style="background:#F0FFF0;border:1px solid var(--green);border-left:4px solid var(--green);border-radius:3px;padding:0.65rem 0.9rem;font-size:0.78rem;color:var(--green);margin-bottom:1rem;display:none;">✅ Voter registered successfully. Biometric record saved.</div>
+      <div class="card">
+        <div class="card-title">Form 6 — Application for Inclusion of Name in Electoral Roll</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="regName" type="text" placeholder="As per official documents"/></div>
+          <div class="form-group"><label class="form-label">Voter ID *</label><input class="form-input" id="regId" type="text" placeholder="e.g. V009"/></div>
+          <div class="form-group"><label class="form-label">Age *</label><input class="form-input" id="regAge" type="number" placeholder="18 or above"/></div>
+          <div class="form-group"><label class="form-label">Assigned Booth *</label>
+            <select class="form-select" id="regBooth"><option value="B-03">B-03 — Vanchiyoor</option><option value="B-07">B-07 — Pattom</option><option value="B-12">B-12 — Kowdiar</option><option value="B-15">B-15 — Sasthamangalam</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Voter Group *</label>
+            <select class="form-select" id="regGroup"><option>Urban Youth</option><option>Senior Citizen</option><option>Farmer</option><option>Student</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Primary Concern *</label>
+            <select class="form-select" id="regIssue"><option>Employment</option><option>Education</option><option>Healthcare</option><option>Pension</option><option>Water Supply</option><option>Subsidy</option><option>Transport</option></select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label">Biometric Authentication *</label>
+            <div class="biometric-box" id="bioBox" onclick="simulateBiometric()">
+              <div style="font-size:2rem;margin-bottom:0.3rem;">👆</div>
+              <div style="font-size:0.75rem;color:var(--muted)" id="bioStatus">Click to simulate Aadhaar fingerprint verification</div>
+            </div>
+          </div>
+          <div style="grid-column:1/-1;display:flex;gap:0.75rem;">
+            <button class="btn-primary" onclick="registerVoter()">SUBMIT FORM 6</button>
+            <button class="btn-outline" onclick="clearRegForm()">CLEAR FORM</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1.2rem;">
+        <div class="card-title">Recently Registered Voters</div>
+        <table><thead><tr><th>Voter ID</th><th>Name</th><th>Booth</th><th>Group</th><th>Status</th></tr></thead><tbody id="regTableBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANDIDATES -->
+  <div class="page" id="page-candidates">
+    <div style="margin-top:0.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+        <div class="section-title" style="margin:0">Candidate Register</div>
+        <button class="btn-gold" onclick="toggleCandForm()">+ ADD CANDIDATE</button>
+      </div>
+      <div class="card" id="candForm" style="display:none;margin-bottom:1.2rem;">
+        <div class="card-title">Nomination Form — Candidate Registration</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group"><label class="form-label">Candidate Name *</label><input class="form-input" id="cName" placeholder="Full legal name"/></div>
+          <div class="form-group"><label class="form-label">Party Affiliation *</label><input class="form-input" id="cParty" placeholder="Party name"/></div>
+          <div class="form-group"><label class="form-label">Constituency</label><select class="form-select" id="cConst"><option>Vanchiyoor</option><option>Pattom</option><option>Kowdiar</option><option>Sasthamangalam</option></select></div>
+          <div class="form-group"><label class="form-label">Symbol</label><select class="form-select" id="cSymbol"><option value="🌸">🌸 Flower</option><option value="⭐">⭐ Star</option><option value="🌿">🌿 Leaf</option><option value="🔥">🔥 Flame</option><option value="🦁">🦁 Lion</option></select></div>
+          <div style="grid-column:1/-1;display:flex;gap:0.75rem;">
+            <button class="btn-primary" onclick="addCandidate()">SUBMIT NOMINATION</button>
+            <button class="btn-outline" onclick="toggleCandForm()">CANCEL</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="card-title">Approved Candidates</div><table><thead><tr><th>Symbol</th><th>Name</th><th>Party</th><th>Constituency</th><th>Status</th></tr></thead><tbody id="candBody"></tbody></table></div>
+        <div class="card"><div class="card-title">Simulated Vote Distribution</div><canvas id="voteChart" height="230"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="page" id="page-analytics">
+    <div style="margin-top:0.5rem;">
+      <div class="section-title">Booth-Level Analytics Dashboard</div>
+      <div class="grid4">
+        <div class="stat-card"><div class="stat-value">62%</div><div class="stat-label">Voter Turnout</div></div>
+        <div class="stat-card gold"><div class="stat-value">5</div><div class="stat-label">Updates Sent</div></div>
+        <div class="stat-card green"><div class="stat-value">3</div><div class="stat-label">Active Booths</div></div>
+        <div class="stat-card saffron"><div class="stat-value">92%</div><div class="stat-label">Graph Accuracy</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="card-title">Issues by Frequency</div><canvas id="issueChart" height="220"></canvas></div>
+        <div class="card"><div class="card-title">Voters per Group</div><canvas id="groupChart" height="220"></canvas></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="card-title">Booth Turnout Comparison (%)</div><canvas id="boothChart" height="200"></canvas></div>
+        <div class="card"><div class="card-title">Age Distribution</div><canvas id="ageChart" height="200"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KNOWLEDGE GRAPH -->
+  <div class="page" id="page-knowledge">
+    <div style="margin-top:0.5rem;">
+      <div class="section-title">AI Knowledge Graph — Voter Node Network</div>
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title">Graph Legend</div>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;font-size:0.72rem;">
+          <span><span style="color:#0B2545;font-size:1rem">●</span> Urban Youth</span>
+          <span><span style="color:#B22222;font-size:1rem">●</span> Senior Citizen</span>
+          <span><span style="color:#C8992A;font-size:1rem">●</span> Farmer</span>
+          <span><span style="color:#138808;font-size:1rem">●</span> Student</span>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="card-title">Voter Nodes</div><div style="display:flex;flex-direction:column;gap:0.4rem;max-height:320px;overflow-y:auto;" id="graphList"></div></div>
+        <div class="card"><div class="card-title">Issue Relationship Radar</div><canvas id="radarChart" height="260"></canvas></div>
+      </div>
+      <div class="section-title" style="margin-top:1rem;">ML Voter Clusters</div>
+      <div class="cluster-grid" id="clusterGrid2"></div>
+    </div>
+  </div>
+
+  <!-- AI ASSISTANT -->
+  <div class="page" id="page-ai">
+    <div style="margin-top:0.5rem;">
+      <div class="section-title">AI Election Intelligence Assistant</div>
+      <div class="notice"><div class="notice-label">🤖 About This Feature</div>This AI assistant analyses booth data, voter patterns and governance updates using an intelligent knowledge graph engine. No API key required — fully embedded and operational.</div>
+      <div class="grid2" style="align-items:start;">
+        <div class="ai-panel">
+          <div class="ai-header">
+            <div class="ai-dot"></div>
+            <span class="ai-header-text">Election AI Assistant</span>
+            <span class="ai-header-sub">Powered by Knowledge Graph · Always On</span>
+          </div>
+          <div class="ai-messages" id="aiMessages">
+            <div class="msg msg-ai">
+              <div class="msg-ai-label">🤖 AI ASSISTANT</div>
+              Namaste! I am the Election Commission AI Assistant. I have full access to booth data for <strong>Thiruvananthapuram District</strong> — including <strong>8 voters</strong>, <strong>4 booths</strong>, <strong>4 voter groups</strong>, and <strong>7 issue categories</strong>.<br/><br/>You may ask me to analyse booths, suggest governance updates, generate reports, or identify patterns. How may I assist you?
+            </div>
+          </div>
+          <div class="ai-suggestions">
+            <span class="ai-chip" onclick="sendChip(this)">Analyse booth B-07</span>
+            <span class="ai-chip" onclick="sendChip(this)">Summarise voter issues</span>
+            <span class="ai-chip" onclick="sendChip(this)">Suggest updates for farmers</span>
+            <span class="ai-chip" onclick="sendChip(this)">Which group needs attention?</span>
+            <span class="ai-chip" onclick="sendChip(this)">Generate booth report</span>
+          </div>
+          <div class="ai-input-area">
+            <input class="ai-input" id="aiInput" placeholder="Ask about voter data, booths, or governance..." onkeydown="if(event.key==='Enter')sendAiMessage()"/>
+            <button class="btn-primary" onclick="sendAiMessage()">SEND</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div class="card">
+            <div class="card-title">Current Voter Data Context</div>
+            <table><thead><tr><th>Booth</th><th>Voters</th><th>Top Issue</th></tr></thead>
+            <tbody>
+              <tr><td>B-03 Vanchiyoor</td><td>2</td><td><span class="badge badge-gold">Water Supply</span></td></tr>
+              <tr><td>B-07 Pattom</td><td>2</td><td><span class="badge badge-navy">Healthcare</span></td></tr>
+              <tr><td>B-12 Kowdiar</td><td>2</td><td><span class="badge" style="background:#E8F5E9;color:#138808">Employment</span></td></tr>
+              <tr><td>B-15 Sasthamangalam</td><td>2</td><td><span class="badge badge-navy">Transport</span></td></tr>
+            </tbody></table>
+          </div>
+          <div class="card">
+            <div class="card-title">AI Capabilities</div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.75rem;">
+              <div>✅ Voter pattern analysis</div>
+              <div>✅ Booth-level insights</div>
+              <div>✅ Governance update generation</div>
+              <div>✅ Knowledge graph interpretation</div>
+              <div>✅ Voter group recommendations</div>
+              <div>✅ Election report drafting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-text">© 2025 Election Commission of India — AI Booth Management System — Prototype v1.0</div>
+      <div class="gov-footer-links"><span>Privacy Policy</span><span>Terms of Use</span><span>Help Desk</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">
+  <div style="font-size:0.62rem;letter-spacing:0.12em;margin-bottom:0.3rem;color:var(--gold2)" id="toastHeader"></div>
+  <div style="font-size:0.78rem;color:var(--white);line-height:1.5" id="toastBody"></div>
+  <div style="font-size:0.6rem;color:#8899BB;margin-top:0.3rem" id="toastFooter"></div>
+</div>
+
+<script>
+var VOTERS=[
+  {id:"V001",name:"Arjun Menon",  booth:"B-12",age:34,group:"Urban Youth",   issue:"Employment"},
+  {id:"V002",name:"Priya Nair",   booth:"B-12",age:28,group:"Urban Youth",   issue:"Education"},
+  {id:"V003",name:"Rajan Kumar",  booth:"B-07",age:62,group:"Senior Citizen",issue:"Healthcare"},
+  {id:"V004",name:"Lakshmi Devi", booth:"B-07",age:58,group:"Senior Citizen",issue:"Pension"},
+  {id:"V005",name:"Amal Thomas",  booth:"B-03",age:41,group:"Farmer",        issue:"Water Supply"},
+  {id:"V006",name:"Sujatha R.",   booth:"B-03",age:38,group:"Farmer",        issue:"Subsidy"},
+  {id:"V007",name:"Dev Pillai",   booth:"B-15",age:25,group:"Student",       issue:"Transport"},
+  {id:"V008",name:"Meera S.",     booth:"B-15",age:23,group:"Student",       issue:"Employment"},
+];
+var CANDIDATES=[
+  {name:"Suresh Babu", party:"Democratic Front", constituency:"Kowdiar",        symbol:"🌸",votes:142},
+  {name:"Anitha Nair", party:"People's Alliance",constituency:"Pattom",         symbol:"⭐",votes:118},
+  {name:"Mohan Das",   party:"Progressive Party",constituency:"Vanchiyoor",     symbol:"🌿",votes:97},
+  {name:"Rekha Pillai",party:"United Council",   constituency:"Sasthamangalam", symbol:"🔥",votes:85},
+];
+var GROUPS=["Urban Youth","Senior Citizen","Farmer","Student"];
+var GROUP_COLORS={"Urban Youth":"#0B2545","Senior Citizen":"#B22222","Farmer":"#C8992A","Student":"#138808"};
+var BOOTHS=[{id:"B-03",x:"22%",y:"65%"},{id:"B-07",x:"48%",y:"28%"},{id:"B-12",x:"73%",y:"55%"},{id:"B-15",x:"60%",y:"80%"}];
+var ISSUE_UPDATES={
+  "Employment":"New skill development scheme launched — apply by April 15",
+  "Education":"3 new digital classrooms opened in your area",
+  "Healthcare":"Free health camp at Pattom Community Hall — March 20",
+  "Pension":"Pension disbursement scheduled for March 25",
+  "Water Supply":"Pipeline upgrade work begins next week in Vanchiyoor",
+  "Subsidy":"Fertilizer subsidy increased by 15% this season",
+  "Transport":"New bus route 57C added covering Sasthamangalam"
+};
+var STEP_LABELS=["Voter Data In","Graph Built","ML Clustering","Updates Delivered"];
+var activeStep=0,running=false,selectedBooth=null,toastTimer=null,bioDone=false,charts={};
+
+// CLOCK
+function updateClock(){
+  var n=new Date();
+  document.getElementById('clockDisplay').textContent=
+    n.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'short',day:'numeric'})+' | '+n.toLocaleTimeString('en-IN');
+}
+setInterval(updateClock,1000); updateClock();
+
+// LOGIN — anyone can log in
+function doLogin(){
+  var u=document.getElementById('loginUser').value.trim();
+  if(!u) u='GUEST';
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  document.getElementById('topUser').textContent='👤 '+u.toUpperCase();
+  initApp();
+}
+document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+function doLogout(){
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+
+// TABS
+var TAB_NAMES={dashboard:'Dashboard',registration:'Voter Registration',candidates:'Candidates',analytics:'Analytics',knowledge:'Knowledge Graph',ai:'AI Assistant'};
+function showTab(name,btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  document.getElementById('breadcrumb').innerHTML='Home &rsaquo; <span>'+TAB_NAMES[name]+'</span>';
+  if(name==='analytics') initAnalyticsCharts();
+  if(name==='candidates') initVoteChart();
+  if(name==='knowledge'){buildGraphNodes();buildClusters('clusterGrid2');initRadarChart();}
+}
+
+function initApp(){
+  buildVoterTable();buildGraphNodes();
+  buildClusters('clusterGrid');buildClusters('clusterGrid2');
+  buildCandidateTable();buildRegTable();
+}
+
+function buildVoterTable(){
+  var b=document.getElementById('voterTableBody');b.innerHTML='';
+  VOTERS.forEach(function(v){
+    var c=GROUP_COLORS[v.group];
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="color:var(--muted);font-size:0.7rem">'+v.id+'</td><td>'+v.name+'</td><td>'+v.booth+'</td>'+
+      '<td><span style="background:'+c+'15;color:'+c+';border-radius:2px;padding:0.1rem 0.45rem;font-size:0.62rem;font-weight:600">'+v.group+'</span></td>'+
+      '<td style="color:var(--muted);font-size:0.72rem">'+v.issue+'</td>';
+    b.appendChild(tr);
+  });
+  document.getElementById('statVoters').textContent=VOTERS.length;
+}
+
+function buildGraphNodes(){
+  var list=document.getElementById('graphList');if(!list)return;
+  list.innerHTML='';
+  VOTERS.forEach(function(v){
+    var c=GROUP_COLORS[v.group];
+    var n=document.createElement('div');
+    n.style.cssText='display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0.7rem;border-radius:3px;background:var(--offwhite);border:1px solid var(--border);margin-bottom:0.3rem;';
+    n.innerHTML='<div style="width:10px;height:10px;border-radius:50%;background:'+c+';flex-shrink:0"></div>'+
+      '<span style="flex:1;font-size:0.75rem">'+v.name+'<span style="color:var(--muted);font-size:0.62rem;margin-left:0.4rem">'+v.booth+'</span></span>'+
+      '<span style="font-size:0.6rem;background:'+c+'15;color:'+c+';border-radius:2px;padding:0.1rem 0.4rem;font-weight:600">'+v.group+'</span>'+
+      '<span style="font-size:0.6rem;color:var(--muted);margin-left:0.4rem">'+v.issue+'</span>';
+    list.appendChild(n);
+  });
+}
+
+function buildClusters(gid){
+  var grid=document.getElementById(gid);if(!grid)return;
+  grid.innerHTML='';
+  GROUPS.forEach(function(g){
+    var members=VOTERS.filter(function(v){return v.group===g;});
+    var c=GROUP_COLORS[g];
+    var card=document.createElement('div');
+    card.className='cluster-card active';
+    card.style.borderLeftColor=c;
+    card.innerHTML='<div style="font-size:0.62rem;font-weight:700;color:'+c+';letter-spacing:0.08em;margin-bottom:0.4rem">'+g.toUpperCase()+'</div>'+
+      '<div style="font-family:\'Noto Serif\',serif;font-size:1.5rem;font-weight:700;color:var(--navy)">'+members.length+'</div>'+
+      '<div style="font-size:0.6rem;color:var(--muted)">voters clustered</div>'+
+      '<div class="cluster-update">📡 '+ISSUE_UPDATES[members[0].issue]+'</div>';
+    grid.appendChild(card);
+  });
+}
+
+function runFlow(){
+  if(running)return;
+  running=true;activeStep=0;
+  for(var i=1;i<=4;i++){document.getElementById('step'+i).classList.remove('active','done');document.getElementById('lbl'+i).textContent=STEP_LABELS[i-1];}
+  document.getElementById('mapSvg').innerHTML='';
+  document.getElementById('runBtn').disabled=true;
+  advanceStep();
+}
+function advanceStep(){
+  activeStep++;
+  if(activeStep>1){var p=document.getElementById('step'+(activeStep-1));p.classList.remove('active');p.classList.add('done');document.getElementById('lbl'+(activeStep-1)).textContent='✓ '+STEP_LABELS[activeStep-2];}
+  if(activeStep<=4){document.getElementById('step'+activeStep).classList.add('active');document.getElementById('lbl'+activeStep).textContent='⟳ '+STEP_LABELS[activeStep-1];}
+  if(activeStep===2) drawEdges();
+  if(activeStep<4){setTimeout(advanceStep,1400);}
+  else{setTimeout(function(){document.getElementById('step4').classList.remove('active');document.getElementById('step4').classList.add('done');document.getElementById('lbl4').textContent='✓ '+STEP_LABELS[3];running=false;document.getElementById('runBtn').disabled=false;showToast('Pipeline Complete','All voter groups clustered and updates delivered.','4 groups · '+VOTERS.length+' voters');},1200);}
+}
+function drawEdges(){
+  var svg=document.getElementById('mapSvg');var area=document.getElementById('mapArea');
+  var W=area.offsetWidth,H=area.offsetHeight;
+  var pts=BOOTHS.map(function(b){return{x:parseFloat(b.x)/100*W,y:parseFloat(b.y)/100*H};});
+  var html='';
+  for(var i=0;i<pts.length;i++) for(var j=i+1;j<pts.length;j++)
+    html+='<line x1="'+pts[i].x+'" y1="'+pts[i].y+'" x2="'+pts[j].x+'" y2="'+pts[j].y+'" stroke="#0B254566" stroke-width="1" stroke-dasharray="5 4"/>';
+  svg.innerHTML=html;
+}
+
+function selectBooth(id){
+  if(selectedBooth===id){document.getElementById('dot-'+id).classList.remove('selected');document.getElementById('voterList').style.display='none';selectedBooth=null;return;}
+  if(selectedBooth) document.getElementById('dot-'+selectedBooth).classList.remove('selected');
+  selectedBooth=id;document.getElementById('dot-'+id).classList.add('selected');
+  var voters=VOTERS.filter(function(v){return v.booth===id;});
+  document.getElementById('voterListTitle').textContent='Booth '+id+' — '+voters.length+' Registered Voters';
+  var rows=document.getElementById('voterRows');rows.innerHTML='';
+  voters.forEach(function(v){
+    var c=GROUP_COLORS[v.group];var row=document.createElement('div');
+    row.className='voter-row';row.onclick=function(){sendUpdate(v);};
+    row.innerHTML='<div><span style="font-size:0.78rem">'+v.name+'</span><span style="font-size:0.6rem;background:'+c+'15;color:'+c+';border-radius:2px;padding:0.1rem 0.45rem;margin-left:0.4rem;font-weight:600">'+v.group+'</span></div><span style="font-size:0.62rem;color:var(--saffron)">📨 Send update</span>';
+    rows.appendChild(row);
+  });
+  document.getElementById('voterList').style.display='block';
+}
+
+function simulateBiometric(){
+  var box=document.getElementById('bioBox'),st=document.getElementById('bioStatus');
+  st.textContent='Scanning fingerprint...';box.style.borderColor='var(--saffron)';
+  setTimeout(function(){st.textContent='✅ Aadhaar biometric verification successful';box.classList.add('verified');bioDone=true;},1400);
+}
+function registerVoter(){
+  var name=document.getElementById('regName').value.trim();
+  var id=document.getElementById('regId').value.trim();
+  var age=document.getElementById('regAge').value.trim();
+  if(!name||!id||!age){showToast('Incomplete Form','Please fill all mandatory fields.','Form 6 validation');return;}
+  if(!bioDone){showToast('Biometric Required','Please complete Aadhaar verification.','Authentication check');return;}
+  VOTERS.push({id:id,name:name,booth:document.getElementById('regBooth').value,age:parseInt(age),group:document.getElementById('regGroup').value,issue:document.getElementById('regIssue').value});
+  buildVoterTable();buildGraphNodes();buildClusters('clusterGrid');buildClusters('clusterGrid2');buildRegTable();
+  document.getElementById('regSuccess').style.display='block';
+  setTimeout(function(){document.getElementById('regSuccess').style.display='none';},3500);
+  showToast('Voter Registered',name+' added to '+document.getElementById('regBooth').value+'.','Biometric verified');
+  clearRegForm();
+}
+function clearRegForm(){
+  ['regName','regId','regAge'].forEach(function(i){document.getElementById(i).value='';});
+  bioDone=false;document.getElementById('bioStatus').textContent='Click to simulate Aadhaar fingerprint verification';
+  document.getElementById('bioBox').classList.remove('verified');document.getElementById('bioBox').style.borderColor='';
+}
+function buildRegTable(){
+  var b=document.getElementById('regTableBody');b.innerHTML='';
+  VOTERS.slice(-5).reverse().forEach(function(v){
+    var c=GROUP_COLORS[v.group];var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-size:0.7rem;color:var(--muted)">'+v.id+'</td><td>'+v.name+'</td><td>'+v.booth+'</td>'+
+      '<td><span style="background:'+c+'15;color:'+c+';border-radius:2px;padding:0.1rem 0.45rem;font-size:0.62rem;font-weight:600">'+v.group+'</span></td>'+
+      '<td><span class="badge badge-green">✓ Verified</span></td>';
+    b.appendChild(tr);
+  });
+}
+
+function toggleCandForm(){var f=document.getElementById('candForm');f.style.display=f.style.display==='none'?'block':'none';}
+function addCandidate(){
+  var name=document.getElementById('cName').value.trim();var party=document.getElementById('cParty').value.trim();
+  if(!name||!party){showToast('Incomplete Form','Please fill candidate name and party.','Nomination form');return;}
+  CANDIDATES.push({name:name,party:party,constituency:document.getElementById('cConst').value,symbol:document.getElementById('cSymbol').value,votes:Math.floor(Math.random()*100+30)});
+  buildCandidateTable();document.getElementById('statCandidates').textContent=CANDIDATES.length;
+  toggleCandForm();document.getElementById('cName').value='';document.getElementById('cParty').value='';
+  if(charts.vote) initVoteChart();
+  showToast('Candidate Added',name+' from '+party+' registered.','Nomination approved');
+}
+function buildCandidateTable(){
+  var b=document.getElementById('candBody');b.innerHTML='';
+  CANDIDATES.forEach(function(c){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-size:1.2rem">'+c.symbol+'</td><td>'+c.name+'</td><td style="color:var(--navy2);font-size:0.72rem">'+c.party+'</td><td style="font-size:0.72rem">'+c.constituency+'</td><td><span class="badge badge-green">✓ Approved</span></td>';
+    b.appendChild(tr);
+  });
+}
+function initVoteChart(){
+  if(charts.vote) charts.vote.destroy();
+  var ctx=document.getElementById('voteChart').getContext('2d');
+  charts.vote=new Chart(ctx,{type:'bar',data:{labels:CANDIDATES.map(function(c){return c.symbol+' '+c.name.split(' ')[0];}),datasets:[{label:'Simulated Votes',data:CANDIDATES.map(function(c){return c.votes;}),backgroundColor:['#0B254522','#B2222222','#C8992A22','#13880822'],borderColor:['#0B2545','#B22222','#C8992A','#138808'],borderWidth:2,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#5A6275',font:{size:10}},grid:{color:'#E8E3D8'}},y:{ticks:{color:'#5A6275'},grid:{color:'#E8E3D8'}}}}});
+}
+
+function initAnalyticsCharts(){
+  var gc=['#0B2545','#B22222','#C8992A','#138808','#1A3A6B','#8B6914','#FF8C00'];
+  if(!charts.issue){var ic={};VOTERS.forEach(function(v){ic[v.issue]=(ic[v.issue]||0)+1;});charts.issue=new Chart(document.getElementById('issueChart').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(ic),datasets:[{data:Object.values(ic),backgroundColor:gc.map(function(c){return c+'33';}),borderColor:gc,borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#1A1A2E',font:{size:10}}}}}});}
+  if(!charts.group){charts.group=new Chart(document.getElementById('groupChart').getContext('2d'),{type:'pie',data:{labels:GROUPS,datasets:[{data:GROUPS.map(function(g){return VOTERS.filter(function(v){return v.group===g;}).length;}),backgroundColor:Object.values(GROUP_COLORS).map(function(c){return c+'33';}),borderColor:Object.values(GROUP_COLORS),borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#1A1A2E',font:{size:10}}}}}});}
+  if(!charts.booth){charts.booth=new Chart(document.getElementById('boothChart').getContext('2d'),{type:'bar',data:{labels:['B-03','B-07','B-12','B-15'],datasets:[{label:'Turnout %',data:[72,58,85,65],backgroundColor:['#0B254522','#B2222222','#C8992A22','#13880822'],borderColor:['#0B2545','#B22222','#C8992A','#138808'],borderWidth:2,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#5A6275'},grid:{color:'#E8E3D8'}},y:{ticks:{color:'#5A6275'},grid:{color:'#E8E3D8'},max:100}}}});}
+  if(!charts.age){charts.age=new Chart(document.getElementById('ageChart').getContext('2d'),{type:'bar',data:{labels:['18-25','26-35','36-45','46-60','60+'],datasets:[{label:'Voters',data:[2,2,2,1,1],backgroundColor:'#0B254522',borderColor:'#0B2545',borderWidth:2,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#5A6275'},grid:{color:'#E8E3D8'}},y:{ticks:{color:'#5A6275'},grid:{color:'#E8E3D8'}}}}});}
+}
+
+function initRadarChart(){
+  if(charts.radar)return;
+  charts.radar=new Chart(document.getElementById('radarChart').getContext('2d'),{type:'radar',data:{labels:['Employment','Education','Healthcare','Pension','Water Supply','Subsidy','Transport'],datasets:[{label:'Urban Youth',data:[2,1,0,0,0,0,1],borderColor:'#0B2545',backgroundColor:'#0B254522',pointBackgroundColor:'#0B2545'},{label:'Senior Citizen',data:[0,0,1,1,0,0,0],borderColor:'#B22222',backgroundColor:'#B2222222',pointBackgroundColor:'#B22222'},{label:'Farmer',data:[0,0,0,0,1,1,0],borderColor:'#C8992A',backgroundColor:'#C8992A22',pointBackgroundColor:'#C8992A'},{label:'Student',data:[1,0,0,0,0,0,1],borderColor:'#138808',backgroundColor:'#13880822',pointBackgroundColor:'#138808'}]},options:{responsive:true,scales:{r:{ticks:{color:'#5A6275',backdropColor:'transparent'},grid:{color:'#C8B99A'},pointLabels:{color:'#1A1A2E',font:{size:9}}}},plugins:{legend:{labels:{color:'#1A1A2E',font:{size:10}}}}}});
+}
+
+function sendUpdate(voter){showToast('Update Dispatched to '+voter.name,ISSUE_UPDATES[voter.issue],'via '+voter.group+' · '+voter.booth);}
+function showToast(header,body,footer){
+  var t=document.getElementById('toast');
+  document.getElementById('toastHeader').textContent='📋 '+header.toUpperCase();
+  document.getElementById('toastBody').textContent=body;
+  document.getElementById('toastFooter').textContent=footer;
+  t.classList.remove('show');void t.offsetWidth;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show');},3500);
+}
+
+// AI ENGINE
+function addAiMsg(role,html){
+  var msgs=document.getElementById('aiMessages');
+  var div=document.createElement('div');div.className='msg msg-'+role;
+  if(role==='ai'){div.innerHTML='<div class="msg-ai-label">🤖 AI ASSISTANT</div>'+html;}else{div.textContent=html;}
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;
+}
+function addThinking(){
+  var msgs=document.getElementById('aiMessages');
+  var div=document.createElement('div');div.className='msg msg-ai';
+  div.innerHTML='<div class="msg-ai-label">🤖 AI ASSISTANT</div><span class="msg-thinking">Analysing voter data...</span>';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;
+}
+function generateAiResponse(q){
+  var t=q.toLowerCase();
+  if(t.indexOf('b-03')>-1||t.indexOf('vanchiyoor')>-1){var v=VOTERS.filter(function(x){return x.booth==='B-03';});return 'Booth <strong>B-03 — Vanchiyoor</strong> Analysis:<br/><br/>• <strong>Total Voters:</strong> '+v.length+'<br/>• <strong>Groups:</strong> '+v.map(function(x){return x.group;}).join(', ')+'<br/>• <strong>Primary Issues:</strong> '+v.map(function(x){return x.issue;}).join(', ')+'<br/>• <strong>AI Recommendation:</strong> Prioritise Water Supply infrastructure updates. Farmer group flagged for subsidy outreach. Suggest SMS campaign targeting agricultural welfare schemes.';}
+  if(t.indexOf('b-07')>-1||t.indexOf('pattom')>-1){var v=VOTERS.filter(function(x){return x.booth==='B-07';});return 'Booth <strong>B-07 — Pattom</strong> Analysis:<br/><br/>• <strong>Total Voters:</strong> '+v.length+'<br/>• <strong>Groups:</strong> '+v.map(function(x){return x.group;}).join(', ')+'<br/>• <strong>Primary Issues:</strong> '+v.map(function(x){return x.issue;}).join(', ')+'<br/>• <strong>AI Recommendation:</strong> Senior Citizen group dominates this booth. Healthcare and Pension are critical. Recommend free health camps and timely pension disbursement notifications via SMS.';}
+  if(t.indexOf('b-12')>-1||t.indexOf('kowdiar')>-1){var v=VOTERS.filter(function(x){return x.booth==='B-12';});return 'Booth <strong>B-12 — Kowdiar</strong> Analysis:<br/><br/>• <strong>Total Voters:</strong> '+v.length+'<br/>• <strong>Groups:</strong> '+v.map(function(x){return x.group;}).join(', ')+'<br/>• <strong>Primary Issues:</strong> '+v.map(function(x){return x.issue;}).join(', ')+'<br/>• <strong>AI Recommendation:</strong> Urban Youth highly represented. Promote skill development and digital literacy. High mobile engagement potential.';}
+  if(t.indexOf('b-15')>-1||t.indexOf('sasthamangalam')>-1){var v=VOTERS.filter(function(x){return x.booth==='B-15';});return 'Booth <strong>B-15 — Sasthamangalam</strong> Analysis:<br/><br/>• <strong>Total Voters:</strong> '+v.length+'<br/>• <strong>Groups:</strong> '+v.map(function(x){return x.group;}).join(', ')+'<br/>• <strong>Primary Issues:</strong> '+v.map(function(x){return x.issue;}).join(', ')+'<br/>• <strong>AI Recommendation:</strong> Student group requires Transport and Employment attention. Suggest route improvements and college job-fair announcements.';}
+  if(t.indexOf('summar')>-1||t.indexOf('overview')>-1||t.indexOf('total')>-1){var ic={};VOTERS.forEach(function(v){ic[v.issue]=(ic[v.issue]||0)+1;});var top=Object.keys(ic).reduce(function(a,b){return ic[a]>ic[b]?a:b;});return '<strong>Voter Data Summary — Thiruvananthapuram</strong><br/><br/>• <strong>Total Voters:</strong> '+VOTERS.length+'<br/>• <strong>Booths:</strong> B-03, B-07, B-12, B-15<br/>• <strong>Groups:</strong> Urban Youth, Senior Citizen, Farmer, Student<br/>• <strong>Top Issue:</strong> '+top+' ('+ic[top]+' voters)<br/>• <strong>Candidates:</strong> '+CANDIDATES.length+'<br/><br/><strong>AI Insight:</strong> All clusters active. Knowledge graph connectivity optimal.';}
+  if(t.indexOf('farmer')>-1){return '<strong>Farmer Group Analysis</strong><br/><br/>• Booth: B-03 — Vanchiyoor<br/>• Issues: Water Supply, Subsidy<br/><br/><strong>Recommended Updates:</strong><br/>① Pipeline upgrade notification for Vanchiyoor<br/>② Fertilizer subsidy hike (15%) announcement<br/>③ Kisan credit card scheme promotion<br/>④ Helpline: 1800-180-1551<br/><br/><em>Channel: SMS + panchayat notice board</em>';}
+  if(t.indexOf('student')>-1){return '<strong>Student Group Analysis</strong><br/><br/>• Booth: B-15 — Sasthamangalam<br/>• Issues: Transport, Employment<br/><br/><strong>Recommended Updates:</strong><br/>① New bus route 57C operational<br/>② Campus recruitment drive in April<br/>③ Skill India digital registration open<br/>④ Student loan: mygov.in<br/><br/><em>Channel: WhatsApp, college notice boards</em>';}
+  if(t.indexOf('senior')>-1||t.indexOf('elderly')>-1||t.indexOf('pension')>-1){return '<strong>Senior Citizen Group Analysis</strong><br/><br/>• Booth: B-07 — Pattom<br/>• Issues: Healthcare, Pension<br/><br/><strong>Recommended Updates:</strong><br/>① Free health camp — Pattom Hall, March 20<br/>② Pension disbursement March 25<br/>③ Ayushman Bharat renewal reminder<br/>④ Helpline: 14567<br/><br/><em>Channel: SMS to registered mobile numbers</em>';}
+  if(t.indexOf('urban')>-1||t.indexOf('youth')>-1||t.indexOf('employment')>-1){return '<strong>Urban Youth Group Analysis</strong><br/><br/>• Booth: B-12 — Kowdiar<br/>• Issues: Employment, Education<br/><br/><strong>Recommended Updates:</strong><br/>① Skill development scheme — apply by April 15<br/>② 3 new digital classrooms in Kowdiar<br/>③ Startup Kerala grants open<br/>④ PMKVY: pmkvyofficial.org<br/><br/><em>Channel: Mobile app, email, social media</em>';}
+  if(t.indexOf('attention')>-1||t.indexOf('priority')>-1||t.indexOf('urgent')>-1){return '<strong>AI Priority Assessment</strong><br/><br/>🔴 <strong>Highest — Senior Citizens (B-07)</strong><br/>Healthcare & pension are time-sensitive.<br/><br/>🟠 <strong>Second — Farmers (B-03)</strong><br/>Water supply & subsidy window is seasonal.<br/><br/>🟡 <strong>Third — Students (B-15)</strong><br/>Ongoing transport & employment concerns.<br/><br/>🟢 <strong>Stable — Urban Youth (B-12)</strong><br/>Digital channels sufficient for outreach.';}
+  if(t.indexOf('report')>-1||t.indexOf('generate')>-1){var d=new Date().toLocaleDateString('en-IN');return '<strong>Official Booth Report — '+d+'</strong><br/>Election Commission of India, Thiruvananthapuram<br/><br/><strong>1. Voter Statistics</strong><br/>Total: '+VOTERS.length+' | Booths: 4 | Groups: 4 | Candidates: '+CANDIDATES.length+'<br/><br/><strong>2. Booth Summary</strong><br/>B-03 Vanchiyoor: Farmers — Water Supply, Subsidy<br/>B-07 Pattom: Senior Citizens — Healthcare, Pension<br/>B-12 Kowdiar: Urban Youth — Employment, Education<br/>B-15 Sasthamangalam: Students — Transport, Employment<br/><br/><strong>3. Status</strong><br/>Graph built ✓ | ML clustering complete ✓ | Updates queued ✓<br/><br/><em>Classification: Internal Use Only</em>';}
+  if(t.indexOf('candidate')>-1){return '<strong>Registered Candidates</strong><br/><br/>'+CANDIDATES.map(function(c,i){return (i+1)+'. '+c.symbol+' <strong>'+c.name+'</strong> — '+c.party+' ('+c.constituency+')';}).join('<br/>')+'<br/><br/>Total: <strong>'+CANDIDATES.length+'</strong> — All approved by Returning Officer.';}
+  if(t.indexOf('graph')>-1||t.indexOf('knowledge')>-1||t.indexOf('network')>-1){return '<strong>Knowledge Graph Status</strong><br/><br/>• Voter nodes: '+VOTERS.length+'<br/>• Booth nodes: 4<br/>• Issue nodes: 7<br/>• Edges: '+(VOTERS.length*2)+'<br/>• DB: Neo4j (simulated)<br/>• ML: Scikit-learn — 4 clusters<br/><br/><strong>Insight:</strong> Employment overlap in B-12 and B-15 enables cross-booth outreach campaigns.';}
+  var fb=['Based on current voter data for Thiruvananthapuram, I recommend reviewing booth-level clustering. Try asking: "analyse booth B-07" or "generate booth report".','ML clustering shows Senior Citizens in B-07 require urgent healthcare outreach. Shall I generate a targeted update?','The knowledge graph shows '+VOTERS.length+' voter nodes across 4 booths. Type "which group needs attention" for priority analysis.','Try asking: "which group needs attention", "suggest updates for farmers", or "generate booth report".'];
+  return fb[Math.floor(Math.random()*fb.length)];
+}
+function sendAiMessage(){
+  var input=document.getElementById('aiInput');var text=input.value.trim();
+  if(!text)return;input.value='';
+  addAiMsg('user',text);var thinking=addThinking();
+  setTimeout(function(){thinking.innerHTML='<div class="msg-ai-label">🤖 AI ASSISTANT</div>'+generateAiResponse(text);document.getElementById('aiMessages').scrollTop=9999;},900);
+}
+function sendChip(el){document.getElementById('aiInput').value=el.textContent;sendAiMessage();}
+</script>
+</body>
+</html>
